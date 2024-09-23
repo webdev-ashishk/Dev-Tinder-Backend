@@ -29,7 +29,8 @@ app.use((err, req, res, next) => {
   console.error(err.stack); // Logs the error for debugging
   res.status(500).send('Something broke!'); // Sends a 500 Internal Server Error response
 });
-app.use("/",(err, req, res, next) => {
+// route specific error handling ..
+app.use('/', (err, req, res, next) => {
   console.error(err.stack); // Logs the error for debugging
   res.status(500).send('Something broke!'); // Sends a 500 Internal Server Error response
 });
