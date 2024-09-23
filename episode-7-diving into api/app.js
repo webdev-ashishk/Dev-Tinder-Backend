@@ -28,6 +28,33 @@ app.post('/signup', async (req, res, next) => {
     next(error);
   }
 });
+// find user by email id
+app.get('/user', async (req, res, next) => {
+  const userEmail = req.body.emailId;
+  try {
+    const users = await User.find({ emailId: userEmail });
+    console.log(typeof users);
+    if (users.length === 0) {
+      console.log('inside the if /user');
+      res.status(400).send('user with this email not found!!');
+    } else {
+      res.send(users);
+    }
+  } catch (error) {
+    console.log('catch triggered in /user route');
+    next(error);
+  }
+});
+// FEED API GET - all the users data
+app.get('/feed', async (req, res, next) => {
+  try {
+    const userData = await User.find({});
+    console.log('userData==>', userData);
+    res.send(userData);
+  } catch (error) {
+    next(error);
+  }
+});
 
 app.use(notFound404);
 app.use(centeralizedErrorMiddleware);
