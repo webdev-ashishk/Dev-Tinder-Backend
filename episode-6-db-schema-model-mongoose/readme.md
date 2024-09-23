@@ -1,0 +1,2 @@
+- whenever do any operation with database must use async and await with try catch .
+- database api are asynchronous .
