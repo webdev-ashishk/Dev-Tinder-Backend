@@ -20,9 +20,10 @@ app.post('/signup', async (req, res, next) => {
   //   emailId: 'akshay@gmail.com',
   //   password: 'kjfjafjf2f',
   // });
-  const user = new User(req.body);
+  // const user = new User(req.body);
   try {
-    await user.save();
+    // await user.save();
+    await User.create(req.body);
     res.send('data save into db successfully!');
   } catch (error) {
     next(error);
@@ -49,13 +50,39 @@ app.get('/user', async (req, res, next) => {
 app.get('/feed', async (req, res, next) => {
   try {
     const userData = await User.find({});
-    console.log('userData==>', userData);
-    res.send(userData);
+    if (userData.length === 0) {
+      res.status(404).send('not data found');
+    } else {
+      res.send(userData);
+    }
   } catch (error) {
     next(error);
   }
 });
+// Delete a user by ID
+app.delete('/user', async (req, res, next) => {
+  const userID = req.body.userID; // send by client
+  try {
+    const deletedUser = await User.findByIdAndDelete(userID);
+    console.log(deletedUser);
+    res.send('User is deleted successfully');
+  } catch (err) {
+    res.status(400).send('Id are not found in DB');
+  }
+});
+// update the Data of the User
 
+app.put('/user/:userID', async (req, res) => {
+  const userID = req.params.userID;
+  const data = req.body;
+  try {
+    const updateUser = await User.findByIdAndUpdate(userID, data);
+    console.log(updateUser);
+    res.send('gmail is update of this user');
+  } catch (error) {
+    res.status(400).send('user id not found');
+  }
+});
 app.use(notFound404);
 app.use(centeralizedErrorMiddleware);
 
