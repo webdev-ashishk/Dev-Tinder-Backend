@@ -13,16 +13,8 @@ app.get('/test', (req, res) => {
   throw new Error('error in test route');
 });
 
-app.post('/signup', async (req, res, next) => {
-  // const user = new User({
-  //   firstName: 'akshai',
-  //   lastName: 'saini',
-  //   emailId: 'akshay@gmail.com',
-  //   password: 'kjfjafjf2f',
-  // });
-  // const user = new User(req.body);
+app.post('/signup', async (req, res) => {
   try {
-    // await user.save();
     await User.create(req.body);
     res.send('data save into db successfully!');
   } catch (error) {
@@ -89,10 +81,13 @@ app.patch('/user/:userID', async (req, res) => {
     );
     console.log(`isUpdateAllowed status : ${isUpdateAllowed}`);
     if (isUpdateAllowed) {
-      const updatedData = await User.findByIdAndUpdate(id, getDataFromTheBody);
+      const updatedData = await User.findByIdAndUpdate(id, getDataFromTheBody, {
+        runValidators: true,
+      });
       console.log(`update ${updatedData}`);
       res.send('data update successfully');
-    } else if (!isUpdateAllowed) {
+    }
+    if (!isUpdateAllowed) {
       throw new Error('update not allowed !!');
     }
     if (data?.skills.length > 10) {
