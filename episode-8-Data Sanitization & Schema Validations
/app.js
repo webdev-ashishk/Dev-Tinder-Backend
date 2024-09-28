@@ -26,7 +26,7 @@ app.post('/signup', async (req, res, next) => {
     await User.create(req.body);
     res.send('data save into db successfully!');
   } catch (error) {
-    next(error);
+    res.status(400).send('catch block exectured' + error.message);
   }
 });
 // find user by email id
@@ -60,8 +60,8 @@ app.get('/feed', async (req, res, next) => {
   }
 });
 // Delete a user by ID
-app.delete('/user', async (req, res, next) => {
-  const userID = req.body.userID; // send by client
+app.delete('/user/:userID', async (req, res, next) => {
+  const userID = req.params.userID; // send by client
   try {
     const deletedUser = await User.findByIdAndDelete(userID);
     console.log(deletedUser);
@@ -70,28 +70,48 @@ app.delete('/user', async (req, res, next) => {
     res.status(400).send('Id are not found in DB');
   }
 });
-// update the Data of the User
 
+// update the firstName of the User .
+app.patch('/user/:userID', async (req, res) => {
+  const id = req.params.userID;
+  const getDataFromTheBody = req.body;
+  try {
+    const ALLOWED_UPDATE = [
+      'firstName',
+      'password',
+      'age',
+      'photoUrl',
+      'about',
+      'skills',
+    ];
+    const isUpdateAllowed = Object.keys(getDataFromTheBody).every((key) =>
+      ALLOWED_UPDATE.includes(key)
+    );
+    console.log(`isUpdateAllowed status : ${isUpdateAllowed}`);
+    if (isUpdateAllowed) {
+      const updatedData = await User.findByIdAndUpdate(id, getDataFromTheBody);
+      console.log(`update ${updatedData}`);
+      res.send('data update successfully');
+    } else if (!isUpdateAllowed) {
+      throw new Error('update not allowed !!');
+    }
+    if (data?.skills.length > 10) {
+      throw new Error(`more than 10 skills not allowed !`);
+    }
+  } catch (error) {
+    res.status(400).send(` catch block - ${error.message}`);
+  }
+});
+
+// update the Data of the User
 app.put('/user/:userID', async (req, res) => {
   const userID = req.params.userID;
   const data = req.body;
   try {
     const updateUser = await User.findByIdAndUpdate(userID, data);
-    console.log(updateUser);
-    res.send('gmail is update of this user');
+    res.send('document is updated ....');
   } catch (error) {
     res.status(400).send('user id not found');
-  }
-});
-// update the firstName of the User .
-app.patch('/user/:userID', async (req, res) => {
-  const id = req.params.userID;
-  const updateData = req.body;
-  try {
-    const updatedFirstName = await User.findByIdAndUpdate(id, updateData);
-    res.send(`update firstName successfully `);
-  } catch (error) {
-    res.status(400).send('user not found in the DB');
   }
 });
 app.use(notFound404);
